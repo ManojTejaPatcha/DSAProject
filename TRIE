@@ -1,0 +1,127 @@
+import java.util.*;
+import java.io.*;
+
+class Trie {
+    TNode root;
+
+    public Trie() {
+        this.root = new TNode();
+    }
+
+    void insertWord(String word) {
+        TNode temp = root;
+        for (char ch : word.toCharArray()) {
+            int id = ch - 'a';
+            if (temp.children[id] == null) {
+                TNode nn = new TNode();
+                temp.children[id] = nn;
+            }
+            temp = temp.children[id];
+        }
+        temp.is = true;
+    }
+
+    boolean hasWord(String word) {
+        TNode temp = root;
+        for (char ch : word.toCharArray()) {
+            int id = ch - 'a';
+            if (temp.children[id] == null)
+                return false;
+            temp = temp.children[id];
+        }
+        return temp.is;
+    }
+
+    List<String> getAllWords() {
+        List<String> ans = new ArrayList<>();
+        StringBuilder path = new StringBuilder();
+        h(root, path, ans);
+        return ans;
+    }
+
+    void h(TNode root, StringBuilder path, List<String> ans) {
+        if (root.is == true)
+            ans.add(path.toString());
+
+        for (int i = 0; i < 26; i++) {
+            if (root.children[i] != null) {
+                char ch = (char) (i + 'a');
+                path.append(ch);
+                h(root.children[i], path, ans);
+                path.setLength(path.length() - 1);
+            }
+        }
+    }
+
+    List<String> getAllWordsWithPrefix(String prefix) {
+        List<String> ans = new ArrayList<>();
+        TNode t = root;
+        for (char ch : prefix.toCharArray()) {
+            int id = ch - 'a';
+            if (t.children[id] == null)
+                return ans;
+            t = t.children[id];
+        }
+        StringBuilder path = new StringBuilder(prefix);
+        h(t, path, ans);
+        return ans;
+    }
+
+    public static void main(String[] args) {
+        Scanner inputScanner = new Scanner(System.in);
+        Trie ts = new Trie();
+        int choice = 0;
+        while (choice != 5) {
+            System.out.println("TRIE OPERATIONS");
+            System.out.println("1. Addition of word");
+            System.out.println("2. Print all the words in trie");
+            System.out.println("3. Print all the words with given prefix");
+            System.out.println("4. Search for a word");
+            System.out.println("5. Exit\n\n");
+            System.out.print("Enter your choice: ");
+            choice = inputScanner.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter the word to insert: ");
+                    String word = inputScanner.next().toLowerCase();
+                    ts.insertWord(word);
+                    break;
+                case 2:
+                    System.out.println("Words in the trie are:");
+                    System.out.println(ts.getAllWords());
+                    break;
+                case 3:
+                    System.out.print("Enter the prefix to search: ");
+                    String prefix = inputScanner.next().toLowerCase();
+                    System.out.println(ts.getAllWordsWithPrefix(prefix));
+                    break;
+                case 4:
+                    System.out.print("Enter the word to search: ");
+                    String searchWord = inputScanner.next().toLowerCase();
+                    if (ts.hasWord(searchWord))
+                        System.out.println(searchWord + " found.");
+                    else
+                        System.out.println("Not found.");
+                    break;
+                case 5:
+                    System.out.println("Exiting.");
+                    break;
+                default:
+                    System.out.println("Enter a valid choice.");
+                    break;
+            }
+        }
+        inputScanner.close();
+    }
+}
+
+class TNode {
+boolean is;
+TNode[] children;
+
+public TNode() {
+this.is = false;
+this.children = new TNode[26];
+}
+}
+
